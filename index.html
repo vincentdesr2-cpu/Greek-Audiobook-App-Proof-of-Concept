@@ -16,7 +16,7 @@
 
 body {
   font-family: SBL;
-  padding: 0px;
+  padding: 80px;
 }
 
 #text {
@@ -32,12 +32,49 @@ span {
 .active {
   background-color: yellow;
 }
+
+#playerBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
+  background: #222;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px;
+  box-sizing: border-box;
+
+  z-index: 1000;
+}
+
+#playerBar button {
+  background: #444;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+#playerBar button:hover {
+  background: #666;
+}
+
+#progressBar {
+  flex: 1;
+}
+	
 </style>
 </head>
 
 <body>
 
-<h1>📖 Greek Reader (Test 37)</h1>
+<h1>📖 Greek Reader (Test 38)</h1>
 
 <!--input-->
 
@@ -69,6 +106,18 @@ span {
 </div>
 <div id="popupOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
 
+<!--player bar-->
+	
+<div id="playerBar">
+  <button id="prevBtn">⏮</button>
+  <button id="playBtn">▶️</button>
+  <button id="nextBtn">⏭</button>
+
+  <input type="range" id="progressBar" value="0" min="0" step="0.1">
+
+  <button id="langBtn">🌐 Greek</button>
+</div>
+	
 <!--text settings-->
 	
 <div id="controls" style="margin-bottom: 15px;">
@@ -194,6 +243,84 @@ popupOverlay.addEventListener("click", () => {
 
 });
 
+// --- PLAYER BAR ---
+	
+const playBtn = document.getElementById("playBtn");
+
+playBtn.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶️";
+  }
+});
+
+const progressBar = document.getElementById("progressBar");
+
+// Set max when audio loads
+audio.addEventListener("loadedmetadata", () => {
+  progressBar.max = audio.duration;
+});
+
+// Update as audio plays
+audio.addEventListener("timeupdate", () => {
+  progressBar.value = audio.currentTime;
+});
+
+// User drags bar
+progressBar.addEventListener("input", () => {
+  audio.currentTime = progressBar.value;
+});
+
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+function getCurrentPhraseIndex() {
+  const time = audio.currentTime;
+
+  for (let i = 0; i < phrases.length; i++) {
+    const start = parseFloat(phrases[i].dataset.start);
+    const nextStart = i < phrases.length - 1
+      ? parseFloat(phrases[i + 1].dataset.start)
+      : Infinity;
+
+    if (time >= start && time < nextStart) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+// NEXT
+nextBtn.addEventListener("click", () => {
+  let index = getCurrentPhraseIndex();
+  if (index < phrases.length - 1) {
+    audio.currentTime = parseFloat(phrases[index + 1].dataset.start);
+    audio.play();
+  }
+});
+
+// PREVIOUS
+prevBtn.addEventListener("click", () => {
+  let index = getCurrentPhraseIndex();
+  if (index > 0) {
+    audio.currentTime = parseFloat(phrases[index - 1].dataset.start);
+    audio.play();
+  }
+});
+
+const langBtn = document.getElementById("langBtn");
+
+langBtn.addEventListener("click", () => {
+  if (langBtn.textContent.includes("Greek")) {
+    langBtn.textContent = "🌐 English";
+  } else {
+    langBtn.textContent = "🌐 Greek";
+  }
+});
+	
 // --- PAUSE WHEN SPACE KEY IS PRESSED ---
 	
 document.addEventListener("keydown", (e) => {
