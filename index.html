@@ -37,7 +37,7 @@ span {
 
 <body>
 
-<h1>📖 Greek Reader (Test 32)</h1>
+<h1>📖 Greek Reader (Test 33)</h1>
 
 <!--input-->
 
@@ -68,7 +68,31 @@ span {
   <div id="popupContent"></div>
 </div>
 <div id="popupOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
+
+<!--text settings-->
+	
+<div id="controls" style="margin-bottom: 15px;">
   
+  <!-- Playback speed -->
+  <label>
+    Speed:
+    <input type="range" id="speedControl" min="0.5" max="2" step="0.1" value="1">
+    <span id="speedValue">1.0x</span>
+  </label>
+
+  <br><br>
+
+  <!-- Text size -->
+  <label>
+    Text size:
+    <input type="range" id="fontControl" min="16" max="40" step="1" value="24">
+    <span id="fontValue">24px</span>
+  </label>
+
+</div>
+	
+<!--actual actual code-->
+	
 <script>
 const audio = document.getElementById("audio");
 const phrases = document.querySelectorAll("#text > span.phrase");
@@ -162,7 +186,29 @@ popupOverlay.addEventListener("click", () => {
   }
 
 });
-  
+
+// --- SPEED CONTROL ---
+const speedControl = document.getElementById("speedControl");
+const speedValue = document.getElementById("speedValue");
+
+speedControl.addEventListener("input", () => {
+  const speed = parseFloat(speedControl.value);
+  audio.playbackRate = speed;
+  speedValue.textContent = speed.toFixed(1) + "x";
+});
+
+
+// --- FONT SIZE CONTROL ---
+const fontControl = document.getElementById("fontControl");
+const fontValue = document.getElementById("fontValue");
+const text = document.getElementById("text");
+
+fontControl.addEventListener("input", () => {
+  const size = fontControl.value + "px";
+  text.style.fontSize = size;
+  fontValue.textContent = size;
+});
+	
 // Debug: check if audio loads
 audio.addEventListener("loadedmetadata", () => {
   console.log("Audio metadata loaded. Duration:", audio.duration);
