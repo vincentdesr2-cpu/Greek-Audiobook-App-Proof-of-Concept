@@ -37,7 +37,7 @@ span {
 
 <body>
 
-<h1>📖 Greek Reader (Test 33)</h1>
+<h1>📖 Greek Reader (Test 34)</h1>
 
 <!--input-->
 
@@ -88,6 +88,10 @@ span {
     <input type="range" id="fontControl" min="16" max="40" step="1" value="24">
     <span id="fontValue">24px</span>
   </label>
+
+  <label for="volumeControl">Volume:</label>
+	<input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
+	<span id="volumeValue">100%</span>
 
 </div>
 	
@@ -207,6 +211,18 @@ fontControl.addEventListener("input", () => {
   const size = fontControl.value + "px";
   text.style.fontSize = size;
   fontValue.textContent = size;
+});
+
+const volumeControl = document.getElementById("volumeControl");
+const volumeValue = document.getElementById("volumeValue");
+
+// Set initial volume
+audio.volume = volumeControl.value;
+
+// Update when user moves slider
+volumeControl.addEventListener("input", () => {
+  audio.volume = volumeControl.value;
+  volumeValue.textContent = Math.round(volumeControl.value * 100) + "%";
 });
 	
 // Debug: check if audio loads
